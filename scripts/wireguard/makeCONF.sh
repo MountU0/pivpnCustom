@@ -119,25 +119,28 @@ wg genkey \
 wg genpsk | tee "keys/${CLIENT_NAME}_psk" &> /dev/null
 echo "::: Client Keys generated"
 
-# Find an unused number for the last octet of the client IP
+# Find an unused number for the 3rd(NETCOUNT) and 4th(COUNT) octets of the client IP
 for i in {2..254}; do
-  if ! grep -q " ${i}$" configs/clients.txt; then
-    COUNT="${i}"
-    echo "${CLIENT_NAME} $(< keys/"${CLIENT_NAME}"_pub) $(date +%s) ${COUNT}" \
-      | tee -a configs/clients.txt > /dev/null
-    break
-  fi
+  for j in {2..254}; do
+    if ! grep -q " ${j} n${i}$" configs/clients.txt; then
+      COUNT="${j}"
+      NETCOUNT="${i}"
+      echo "${CLIENT_NAME} $(< keys/"${CLIENT_NAME}"_pub) $(date +%s) ${COUNT} n${NETCOUNT}" \
+        | tee -a configs/clients.txt > /dev/null
+      break 2
+    fi
+  done
 done
 
 # Disabling SC2154, variables sourced externaly
 # shellcheck disable=SC2154
-NET_REDUCED="${pivpnNET::-2}"
+NET_REDUCED="${pivpnNET::-4}"
 
 # shellcheck disable=SC2154
 {
   echo '[Interface]'
   echo "PrivateKey = $(cat "keys/${CLIENT_NAME}_priv")"
-  echo -n "Address = ${NET_REDUCED}.${COUNT}/${subnetClass}"
+  echo -n "Address = ${NET_REDUCED}.${NETCOUNT}.${COUNT}/${subnetClass}"
 
   if [[ "${pivpnenableipv6}" == 1 ]]; then
     echo ",${pivpnNETv6}${COUNT}/${subnetClassv6}"
@@ -172,7 +175,7 @@ echo "::: Client config generated"
   echo '[Peer]'
   echo "PublicKey = $(cat "keys/${CLIENT_NAME}_pub")"
   echo "PresharedKey = $(cat "keys/${CLIENT_NAME}_psk")"
-  echo -n "AllowedIPs = ${NET_REDUCED}.${COUNT}/32"
+  echo -n "AllowedIPs = ${NET_REDUCED}.${NETCOUNT}.${COUNT}/32"
 
   if [[ "${pivpnenableipv6}" == 1 ]]; then
     echo ",${pivpnNETv6}${COUNT}/128"
@@ -186,7 +189,7 @@ echo "::: Client config generated"
 echo "::: Updated server config"
 
 if [[ -f /etc/pivpn/hosts.wireguard ]]; then
-  echo "${NET_REDUCED}.${COUNT} ${CLIENT_NAME}.pivpn" \
+  echo "${NET_REDUCED}.${NETCOUNT}.${COUNT} ${CLIENT_NAME}.pivpn" \
     | tee -a /etc/pivpn/hosts.wireguard > /dev/null
 
   if [[ "${pivpnenableipv6}" == 1 ]]; then
