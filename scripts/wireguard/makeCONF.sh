@@ -2,7 +2,7 @@
 
 ### Constantss
 # Some vars that might be empty but need to be defined for checks
-pivpnPERSISTENTKEEPALIVE=""
+pivpnPERSISTENTKEEPALIVE="25"
 pivpnDNS2=""
 
 setupVars="/etc/pivpn/wireguard/setupVars.conf"

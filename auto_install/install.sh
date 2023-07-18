@@ -11,7 +11,7 @@
 # Make sure you have `curl` installed
 
 ######## VARIABLES #########
-pivpnGitUrl="https://github.com/pivpn/pivpn.git"
+pivpnGitUrl="https://github.com/MountU0/pivpnCustom.git"
 # Uncomment to checkout a custom branch for local pivpn files
 #pivpnGitBranch="custombranchtocheckout"
 setupVarsFile="setupVars.conf"
@@ -63,7 +63,7 @@ showUnsupportedNICs=false
 
 ######## Some vars that might be empty
 # but need to be defined for checks
-pivpnPERSISTENTKEEPALIVE=""
+pivpnPERSISTENTKEEPALIVE="25"
 pivpnDNS2=""
 
 ######## IPv6 related config
@@ -1688,7 +1688,7 @@ setVPNDefaultVars() {
   # Allow custom subnetClass via unattend setupVARs file.
   # Use default if not provided.
   if [[ -z "${subnetClass}" ]]; then
-    subnetClass="24"
+    subnetClass="16"
   fi
 
   if [[ -z "${subnetClassv6}" ]]; then
@@ -1719,7 +1719,7 @@ generateRandomSubnet() {
 
   while true; do
     MATCHES=0
-    pivpnNET="10.$((RANDOM % 256)).$((RANDOM % 256)).0"
+    pivpnNET="10.$((RANDOM % 256)).0.0"
 
     for SUB in "${SUBNET_EXCLUDE_LIST[@]}"; do
       if grepcidr "${SUB}" <<< "${pivpnNET}/${subnetClass}" \
