@@ -142,8 +142,9 @@ NET_REDUCED="${pivpnNET::-4}"
   echo "PrivateKey = $(cat "keys/${CLIENT_NAME}_priv")"
   echo -n "Address = ${NET_REDUCED}.${NETCOUNT}.${COUNT}/${subnetClass}"
 
+  #SPECIAL FOR MY SERVERS (need to add 100)
   if [[ "${pivpnenableipv6}" == 1 ]]; then
-    echo ",${pivpnNETv6}${COUNT}/${subnetClassv6}"
+    echo ",${pivpnNETv6}$((${COUNT}+100))/${subnetClassv6}"
   else
     echo
   fi
@@ -177,8 +178,9 @@ echo "::: Client config generated"
   echo "PresharedKey = $(cat "keys/${CLIENT_NAME}_psk")"
   echo -n "AllowedIPs = ${NET_REDUCED}.${NETCOUNT}.${COUNT}/32"
 
+  #SPECIAL FOR MY SERVERS (need to add 100)
   if [[ "${pivpnenableipv6}" == 1 ]]; then
-    echo ",${pivpnNETv6}${COUNT}/128"
+    echo ",${pivpnNETv6}$((${COUNT}+100))/128"
   else
     echo
   fi
@@ -192,8 +194,9 @@ if [[ -f /etc/pivpn/hosts.wireguard ]]; then
   echo "${NET_REDUCED}.${NETCOUNT}.${COUNT} ${CLIENT_NAME}.pivpn" \
     | tee -a /etc/pivpn/hosts.wireguard > /dev/null
 
+  #SPECIAL FOR MY SERVERS (need to add 100)
   if [[ "${pivpnenableipv6}" == 1 ]]; then
-    echo "${pivpnNETv6}${COUNT} ${CLIENT_NAME}.pivpn" \
+    echo "${pivpnNETv6}$((${COUNT}+100)) ${CLIENT_NAME}.pivpn" \
       | tee -a /etc/pivpn/hosts.wireguard > /dev/null
   fi
 
